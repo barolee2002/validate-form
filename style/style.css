@@ -104,3 +104,18 @@ html {
 .spacer {
   margin-top: 36px;
 }
+.popup-confirm {
+  display: none;
+  position: fixed;
+  top : 25px;
+  width : 30%;
+  height : 50px;
+  z-index: 100;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #ddd;
+  font-size: 24px;
+  text-align: center;
+  line-height: 50px;
+  border-radius: 50px;
+}

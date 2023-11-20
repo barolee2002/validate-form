@@ -47,6 +47,12 @@ function Validator(options) {
             return (values[input.name] = input.value) && values
           }, {})
           options.onSubmit(formValue)
+          var successSignup = document.querySelector('.popup-confirm')
+          successSignup.style.display = 'block'
+          setTimeout(() => {
+          successSignup.style.display = "none"
+
+          }, 2000)
         }
       } else {
         console.log('Có lỗi');
