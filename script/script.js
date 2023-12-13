@@ -1,4 +1,4 @@
-function Validator(options) {
+function Validator({ form, formGroupSelector, errorSelector, rules, onSubmit }) {
   function getParent(element, selector) {
     while (element.parentElement) {
       if (element.parentElement.matches(selector)) {
@@ -10,7 +10,7 @@ function Validator(options) {
 
   var selectorRules = {};
   function validate(inputElement, rule) {
-    var errorElement = getParent(inputElement, options.formGroupSelector).querySelector(options.errorSelector);
+    var errorElement = getParent(inputElement, formGroupSelector).querySelector(errorSelector);
     var errorMessage;
     var rules = selectorRules[rule.selector];
     for (var i = 0; i < rules.length; ++i) {
@@ -19,20 +19,20 @@ function Validator(options) {
     }
     if (errorMessage) {
       errorElement.innerText = errorMessage;
-      getParent(inputElement, options.formGroupSelector).classList.add('invalid');
+      getParent(inputElement, formGroupSelector).classList.add('invalid');
     } else {
       errorElement.innerText = '';
-      getParent(inputElement, options.formGroupSelector).classList.remove('invalid');
+      getParent(inputElement, formGroupSelector).classList.remove('invalid');
     }
     return !errorMessage
   }
-  var formElement = document.querySelector(options.form);
+  var formElement = document.querySelector(form);
   if (formElement) {
     formElement.onsubmit = function (e) {
       e.preventDefault();
 
       var isFormValid = true;
-      options.rules.forEach(function (rule) {
+      rules.forEach(function (rule) {
         var inputElement = formElement.querySelector(rule.selector);
         var isValid = validate(inputElement, rule);
         if (!isValid) {
@@ -40,17 +40,16 @@ function Validator(options) {
         }
       });
       if (isFormValid) {
-        if (typeof options.onSubmit === 'function') {
-          
+        if (typeof onSubmit === 'function') {
           var enableInput = formElement.querySelectorAll('[name]')
           var formValue = Array.from(enableInput).reduce(function (values, input) {
             return (values[input.name] = input.value) && values
           }, {})
-          options.onSubmit(formValue)
+          onSubmit(formValue)
           var successSignup = document.querySelector('.popup-confirm')
           successSignup.style.display = 'block'
           setTimeout(() => {
-          successSignup.style.display = "none"
+            successSignup.style.display = "none"
 
           }, 2000)
         }
@@ -59,7 +58,7 @@ function Validator(options) {
 
       }
     }
-    options.rules.forEach(function (rule) {
+    rules.forEach(function (rule) {
       if (Array.isArray(selectorRules[rule.selector])) {
         selectorRules[rule.selector].push(rule.test);
       } else {
@@ -73,9 +72,9 @@ function Validator(options) {
           validate(inputElement, rule);
         }
         inputElement.oninput = function () {
-          var errorElement = getParent(inputElement, options.formGroupSelector).querySelector(options.errorSelector);
+          var errorElement = getParent(inputElement, formGroupSelector).querySelector(errorSelector);
           errorElement.innerText = '';
-          getParent(inputElement, options.formGroupSelector).classList.remove('invalid');
+          getParent(inputElement, formGroupSelector).classList.remove('invalid');
         }
       });
     });
@@ -100,29 +99,29 @@ Validator.isEmail = function (selector, message) {
     }
   };
 }
-const checkCharactor  = (str) =>{
+const checkCharactor = (str) => {
   let upperCase = false
   let lowerCase = false
   for (var i = 0; i < str.length; i++) {
-    if(str[i] === str[i].toUpperCase()) {
+    if (str[i] === str[i].toUpperCase()) {
       upperCase = true;
     }
-    if(str[i] === str[i].toLowerCase()) {
+    if (str[i] === str[i].toLowerCase()) {
       lowerCase = true;
     }
   }
   return upperCase === false | lowerCase === false ? false : true
 }
 const checkLength = (str) => {
-  if(str.length >= 8 && str.length <=32) {
+  if (str.length >= 8 && str.length <= 32) {
     return true;
-  } else {return false}
+  } else { return false }
 }
 Validator.isPassword = function (selector, message) {
   return {
     selector: selector,
     test: function (value) {
-      return checkLength(value)&&checkCharactor(value) ? undefined :message || `Password có từ 8-32 kí tự, ít nhất 1 chữ hoa và 1 chữ thường`;
+      return checkLength(value) && checkCharactor(value) ? undefined : message || `Password có từ 8-32 kí tự, ít nhất 1 chữ hoa và 1 chữ thường`;
     }
   };
 }
@@ -131,7 +130,7 @@ Validator.isConfirmed = function (selector, getConfirmValue, message) {
   return {
     selector: selector,
     test: function (value) {
-      
+
       return value === getConfirmValue() ? undefined : message || 'Giá trị nhập vào không chính xác';
     }
   }
